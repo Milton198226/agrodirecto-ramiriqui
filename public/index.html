@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgroDirecto Ramiriqui | Circuitos Cortos</title>
+  <style>
+    body { background-color: #f0f4f0; font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; }
+    .topbar { background: linear-gradient(135deg, #1b5e20, #2e7d32); color: white; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .badge-trl { background: #ffc107; color: #1b1b1b; padding: 5px 12px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; }
+    .container-app { max-width: 1000px; margin: 20px auto; padding: 0 15px; }
+    .tabs { display: flex; gap: 10px; background: white; padding: 10px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 20px; flex-wrap: wrap; }
+    .tab-btn { flex: 1; padding: 12px; border: none; border-radius: 8px; background: #e8f5e9; color: #1b5e20; font-weight: 700; cursor: pointer; font-size: 1rem; }
+    .tab-btn.active { background: #2e7d32; color: white; }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .box { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 20px; }
+    .grid-prod { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    .card-agro { background: white; border-radius: 12px; padding: 18px; border-left: 6px solid #2e7d32; box-shadow: 0 3px 10px rgba(0,0,0,0.08); }
+    .tag-vereda { background: #e8f5e9; color: #1b5e20; padding: 4px 10px; border-radius: 15px; font-size: 0.8rem; font-weight: 700; float: right; }
+    .precio { font-size: 1.5rem; font-weight: 800; color: #1b5e20; margin: 10px 0; }
+    .btn-verde { background: #2e7d32; color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; width: 100%; }
+    .btn-wa { display: block; text-align: center; margin-top: 8px; padding: 8px; border: 2px solid #25d366; color: #128c7e; border-radius: 8px; text-decoration: none; font-weight: 700; }
+    .input-agro { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; margin-bottom: 12px; box-sizing: border-box; font-size: 1rem; }
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <div style="font-size: 1.25rem; font-weight: 800;">🌱 AgroDirecto Ramiriqui</div>
+  <div class="badge-trl">Prototipo TRL 5 - Bajo Consumo</div>
+</div>
+<div class="container-app">
+  <div class="tabs">
+    <button class="tab-btn active" onclick="verTab('catalogo', this)">🛒 Catalogo Directo</button>
+    <button class="tab-btn" onclick="verTab('productor', this)">🚜 Soy Productor</button>
+    <button class="tab-btn" onclick="verTab('pedidos', this)">📦 Pedidos y Admin</button>
+  </div>
+  <div id="catalogo" class="panel active">
+    <div class="box" style="display: flex; gap: 10px; flex-wrap: wrap;">
+      <input type="text" id="buscador" class="input-agro" style="flex: 2; margin: 0;" placeholder="Buscar papa, feijoa, mora, vereda..." onkeyup="renderProductos()">
+      <select id="filtroCategoria" class="input-agro" style="flex: 1; margin: 0;" onchange="renderProductos()">
+        <option value="Todas">Todas las categorias</option>
+        <option value="Tuberculos">Tuberculos</option>
+        <option value="Frutas">Frutas</option>
+        <option value="Hortalizas">Hortalizas</option>
+      </select>
+    </div>
+    <div id="listaProductos" class="grid-prod"></div>
+  </div>
+  <div id="productor" class="panel">
+    <div class="box">
+      <h3 style="color: #1b5e20; margin-top: 0;">Publicar Nueva Cosecha (Sin Intermediarios)</h3>
+      <form onsubmit="publicarProducto(event)">
+        <input type="text" id="prodNombreUser" class="input-agro" value="Don Jose Maria Lopez" required>
+        <select id="prodVereda" class="input-agro"><option>Vereda Guacamayas</option><option>Vereda El Escobal</option><option>Vereda Caicedos</option></select>
+        <input type="text" id="prodNombre" class="input-agro" placeholder="Producto (Ej. Arveja Verde)" required>
+        <select id="prodCat" class="input-agro"><option>Tuberculos</option><option>Frutas</option><option>Hortalizas</option></select>
+        <input type="number" id="prodPrecio" class="input-agro" placeholder="Precio por Kg (COP)" required>
+        <input type="number" id="prodCant" class="input-agro" placeholder="Cantidad Disponible (Kg)" required>
+        <input type="text" id="prodTel" class="input-agro" value="573104567890" required>
+        <button type="submit" class="btn-verde">Publicar Oferta en el Catalogo</button>
+      </form>
+    </div>
+  </div>
+  <div id="pedidos" class="panel">
+    <div class="box"><h3 style="color: #1b5e20; margin-top: 0;">Solicitudes de Compra Directa</h3><div id="listaPedidos"></div></div>
+    <div class="box">
+      <h3 style="margin-top: 0;">Registro de Usuario (Ley 1581 de 2012)</h3>
+      <form onsubmit="registrarUsuario(event)">
+        <input type="text" id="regNombre" class="input-agro" placeholder="Nombre completo" required>
+        <input type="text" id="regTel" class="input-agro" placeholder="Telefono movil" required>
+        <select id="regRol" class="input-agro"><option>Productor Campesino</option><option>Comerciante Minorista</option><option>Consumidor Final</option></select>
+        <input type="text" id="regVereda" class="input-agro" placeholder="Vereda o Barrio" required>
+        <label style="display: block; margin-bottom: 12px;"><input type="checkbox" id="regHabeas" required> Autorizo tratamiento de datos (Ley 1581 de 2012)</label>
+        <button type="submit" class="btn-verde" style="background: #212529;">Registrar Cuenta</button>
+      </form>
+      <hr><h4>Usuarios Registrados (<span id="totalUsuarios">4</span>)</h4><ul id="listaUsuarios"></ul>
+    </div>
+  </div>
+</div>
+<script>
+  var productosDB = [
+    { id: 101, productor: "Don Jose Maria Lopez", tel: "573104567890", vereda: "Vereda Guacamayas", nombre: "Papa Pastusa Suprema", cat: "Tuberculos", precio: 1800, cant: 500, fecha: "2026-11-18" },
+    { id: 102, productor: "Maria Fernanda Parra", tel: "573119876543", vereda: "Vereda El Escobal", nombre: "Feijoa Organica Fresca", cat: "Frutas", precio: 4500, cant: 120, fecha: "2026-11-18" },
+    { id: 103, productor: "Don Jose Maria Lopez", tel: "573104567890", vereda: "Vereda Guacamayas", nombre: "Arracacha Amarilla", cat: "Tuberculos", precio: 2600, cant: 300, fecha: "2026-11-17" },
+    { id: 104, productor: "Maria Fernanda Parra", tel: "573119876543", vereda: "Vereda El Escobal", nombre: "Mora de Castilla", cat: "Frutas", precio: 5200, cant: 85, fecha: "2026-11-18" }
+  ];
+  var pedidosDB = [{ id: 5001, comprador: "Fruver La Cosecha Tunja", producto: "Papa Pastusa Suprema", cant: 100, total: 180000, estado: "CONFIRMADO" }];
+  var usuariosDB = [
+    { nombre: "Don Jose Maria Lopez", rol: "Productor Campesino", vereda: "Vereda Guacamayas" },
+    { nombre: "Maria Fernanda Parra", rol: "Productor Campesino", vereda: "Vereda El Escobal" },
+    { nombre: "Fruver La Cosecha Tunja", rol: "Comerciante Minorista", vereda: "Plaza Sur Tunja" },
+    { nombre: "Admin AgroDirecto", rol: "Administrador", vereda: "Casco Urbano Ramiriqui" }
+  ];
+
+  function verTab(id, btn) {
+    document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active'); });
+    document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  function renderProductos() {
+    var q = document.getElementById('buscador').value.toLowerCase();
+    var cat = document.getElementById('filtroCategoria').value;
+    var html = "";
+    for (var i = 0; i < productosDB.length; i++) {
+      var p = productosDB[i];
+      if ((cat === "Todas" || p.cat === cat) && (!q || p.nombre.toLowerCase().indexOf(q) !== -1 || p.vereda.toLowerCase().indexOf(q) !== -1) && p.cant > 0) {
+        html += '<div class="card-agro"><span class="tag-vereda">' + p.vereda + '</span><h4 style="margin:0 0 6px 0;">' + p.nombre + '</h4><div style="color:#555;font-size:0.9rem;">Productor: <b>' + p.productor + '</b><br>Cosecha: ' + p.fecha + '</div><div class="precio">$' + p.precio.toLocaleString('es-CO') + ' <small style="font-size:0.85rem;color:#666;">/ kg</small></div><div style="margin-bottom:12px;">Disponible: <b>' + p.cant + ' kg</b></div><button class="btn-verde" onclick="hacerPedido(' + p.id + ')">🛒 Pedir Directo</button><a class="btn-wa" target="_blank" href="https://wa.me' + p.tel + '">💬 Contactar por WhatsApp</a></div>';
+      }
+    }
+    document.getElementById('listaProductos').innerHTML = html;
+  }
+
+  function hacerPedido(id) {
+    for (var i = 0; i < productosDB.length; i++) {
+      if (productosDB[i].id === id) {
+        var p = productosDB[i];
+        var comprador = prompt("Ingrese su nombre o negocio para pedir " + p.nombre + ":", "Fruver El Centro");
+        if (!comprador) return;
+        var cant = parseInt(prompt("Cuantos kg desea solicitar? (Disponible: " + p.cant + " kg)", "30"));
+        if (!cant || cant <= 0 || cant > p.cant) { alert("Cantidad no valida."); return; }
+        p.cant -= cant;
+        pedidosDB.unshift({ id: Math.floor(5002 + Math.random() * 4000), comprador: comprador, producto: p.nombre, cant: cant, total: cant * p.precio, estado: "PENDIENTE" });
+        alert("Pedido registrado con exito. Inventario actualizado.");
+        renderProductos();
+        renderPedidos();
+        break;
+      }
+    }
+  }
+
+  function publicarProducto(e) {
+    e.preventDefault();
+    productosDB.unshift({ id: Date.now(), productor: document.getElementById('prodNombreUser').value, vereda: document.getElementById('prodVereda').value, nombre: document.getElementById('prodNombre').value, cat: document.getElementById('prodCat').value, precio: parseInt(document.getElementById('prodPrecio').value), cant: parseInt(document.getElementById('prodCant').value), tel: document.getElementById('prodTel').value, fecha: "2026-11-18" });
+    e.target.reset();
+    alert("Producto publicado en el catalogo directo.");
+    renderProductos();
+  }
+
+  function renderPedidos() {
+    var html = "";
+    for (var i = 0; i < pedidosDB.length; i++) {
+      var ped = pedidosDB[i];
+      html += '<div style="border:1px solid #ddd;border-radius:8px;padding:12px;margin-bottom:10px;background:#f9fbf9;"><b>Pedido #' + ped.id + ' - ' + ped.producto + ' (' + ped.cant + ' kg)</b><span style="float:right;background:#2e7d32;color:white;padding:2px 8px;border-radius:10px;font-size:0.8rem;">' + ped.estado + '</span><div style="color:#555;font-size:0.9rem;margin-top:4px;">Comprador: ' + ped.comprador + ' - Total: <b>$' + ped.total.toLocaleString('es-CO') + '</b></div></div>';
+    }
+    document.getElementById('listaPedidos').innerHTML = html;
+  }
+
+  function renderUsuarios() {
+    document.getElementById('totalUsuarios').innerText = usuariosDB.length;
+    var html = "";
+    for (var i = 0; i < usuariosDB.length; i++) { html += '<li><b>' + usuariosDB[i].nombre + '</b> (' + usuariosDB[i].rol + ') - ' + usuariosDB[i].vereda + '</li>'; }
+    document.getElementById('listaUsuarios').innerHTML = html;
+  }
+
+  function registrarUsuario(e) {
+    e.preventDefault();
+    usuariosDB.push({ nombre: document.getElementById('regNombre').value, rol: document.getElementById('regRol').value, vereda: document.getElementById('regVereda').value });
+    renderUsuarios();
+    e.target.reset();
+    alert("Cuenta registrada cumpliendo Ley 1581 de 2012.");
+  }
+
+  renderProductos();
+  renderPedidos();
+  renderUsuarios();
+</script>
+</body>
+</html>
